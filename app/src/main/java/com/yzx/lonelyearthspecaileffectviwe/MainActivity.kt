@@ -11,6 +11,8 @@ import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var posterAnimator: ObjectAnimator
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -19,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         Glide.with(this).load(url)
             .apply(RequestOptions.bitmapTransform(BlurTransformation(100, 6))).into(ivBackground)
         Glide.with(this).load(url).into(ivPoster)
-        val posterAnimator = initPosterAnimator()
+         initPosterAnimator()
         lonelyEarthSpecialEffect.setStartSize((resources.displayMetrics.widthPixels / 2 - 80 * resources.displayMetrics.density).toFloat())
 
         button.setOnClickListener {
@@ -39,13 +41,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initPosterAnimator(): Animator {
-        val posterAnimator =
+         posterAnimator =
             ObjectAnimator.ofFloat(ivPoster, "rotation", 0f, 360f)
-        posterAnimator!!.apply {
+        posterAnimator.apply {
             repeatCount = -1
             interpolator = LinearInterpolator()
             duration = 20000
         }
         return posterAnimator
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (posterAnimator.isRunning){
+            posterAnimator.cancel()
+        }
     }
 }
